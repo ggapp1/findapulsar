@@ -1,0 +1,106 @@
+    Mean of the integrated profile  \
+0                       140.562500   
+1                       102.507812   
+2                       103.015625   
+3                       136.750000   
+4                        88.726562   
+
+    Standard deviation of the integrated profile  \
+0                                      55.683782   
+1                                      58.882430   
+2                                      39.341649   
+3                                      57.178449   
+4                                      40.672225   
+
+    Excess kurtosis of the integrated profile  \
+0                                   -0.234571   
+1                                    0.465318   
+2                                    0.323328   
+3                                   -0.068415   
+4                                    0.600866   
+
+    Skewness of the integrated profile   Mean of the DM-SNR curve  \
+0                            -0.699648                   3.199833   
+1                            -0.515088                   1.677258   
+2                             1.051164                   3.121237   
+3                            -0.636238                   3.642977   
+4                             1.123492                   1.178930   
+
+    Standard deviation of the DM-SNR curve  \
+0                                19.110426   
+1                                14.860146   
+2                                21.744669   
+3                                20.959280   
+4                                11.468720   
+
+    Excess kurtosis of the DM-SNR curve   Skewness of the DM-SNR curve  \
+0                              7.975532                      74.242225   
+1                             10.576487                     127.393580   
+2                              7.735822                      63.171909   
+3                              6.896499                      53.593661   
+4                             14.269573                     252.567306   
+
+   target_class  
+0             0  
+1             0  
+2             0  
+3             0  
+4             0  
+Index([u' Mean of the integrated profile',
+       u' Standard deviation of the integrated profile',
+       u' Excess kurtosis of the integrated profile',
+       u' Skewness of the integrated profile', u' Mean of the DM-SNR curve',
+       u' Standard deviation of the DM-SNR curve',
+       u' Excess kurtosis of the DM-SNR curve',
+       u' Skewness of the DM-SNR curve', u'target_class'],
+      dtype='object')
+[102.5078125   58.88243001   0.46531815  -0.51508791   1.67725752
+  14.86014572  10.57648674 127.3935796 ]
+0
+true, false, total on dataset, %
+1639 16259 17898 9
+true, false, total on training, %
+1226 12197 13423 9
+true, false, total on test, % 
+413 4062 4475 9
+
+#### SVM
+
+0.980782122905028
+[[4038   24]
+ [  62  351]]
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+dense_1 (Dense)              (None, 8)                 72        
+_________________________________________________________________
+dense_2 (Dense)              (None, 880)               7920      
+_________________________________________________________________
+dense_3 (Dense)              (None, 540)               475740    
+_________________________________________________________________
+dense_4 (Dense)              (None, 180)               97380     
+_________________________________________________________________
+dense_5 (Dense)              (None, 1)                 181       
+=================================================================
+Total params: 581,293
+Trainable params: 581,293
+Non-trainable params: 0
+_________________________________________________________________
+
+#### NN
+
+0.9749720670391061
+[[4000   62]
+ [  50  363]]
+
+#### RF
+
+0.9812290502793296
+[[4033   29]
+ [  55  358]]
+
+#### NB
+
+0.9506145251396648
+[[3895  167]
+ [  54  359]]
