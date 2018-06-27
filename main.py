@@ -8,10 +8,16 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import optimizers
 from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.metrics import confusion_matrix
+from sklearn.cluster import KMeans
+from sklearn.model_selection import cross_val_score
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import BaggingClassifier
 
-def NN(x_train, x_test, y_train, y_test):
+cv_k = 50
+
+def NN(X_data, Y_data, x_train, x_test, y_train, y_test):
 	num_neurons = 1600
 	optimizer = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
 	epochs = 10
@@ -28,12 +34,13 @@ def NN(x_train, x_test, y_train, y_test):
 	model.fit(x_train, y_train, epochs = epochs, batch_size = batch_size, verbose = 0)
 	nn_pred = model.predict_classes(x_test)
 	print "\n#### NN\n"
-	print accuracy_score(y_test, nn_pred)
+	print (accuracy_score(y_test, nn_pred))
 	print confusion_matrix(y_test, nn_pred)
 
 
 
-def SVM(x_train, x_test, y_train, y_test):
+
+def SVM(X_data, Y_data, x_train, x_test, y_train, y_test):
 	svm_classifier = svm.SVC(kernel='rbf',C=200, degree=5 ,gamma=0.0001)
 	svm_classifier.fit(x_train, y_train)
 
@@ -42,24 +49,49 @@ def SVM(x_train, x_test, y_train, y_test):
 	print accuracy_score(y_test, svm_pred)
 	print confusion_matrix(y_test, svm_pred)
 
-def randomForest(x_train, x_test, y_train, y_test):
-	rfc = RandomForestClassifier()
+	score =  cross_val_score(svm_classifier, X_data, Y_data, cv=cv_k)
+	print sum(score)/len(score)
+
+
+def randomForest(X_data, Y_data, x_train, x_test, y_train, y_test):
+	rfc = RandomForestClassifier(n_estimators=16)
 	rfc.fit(x_train, y_train)
 	rfc_pred  = rfc.predict(x_test)
 	print "\n#### RF\n"
-	print accuracy_score(y_test, rfc_pred)
+	print (accuracy_score(y_test, rfc_pred))
 	print confusion_matrix(y_test, rfc_pred)
+	score =  cross_val_score(rfc, X_data, Y_data, cv=cv_k)
+	print sum(score)/len(score)
 
-def naiveBayes(x_train, x_test, y_train, y_test):
+def naiveBayes(X_data, Y_data, x_train, x_test, y_train, y_test):
 	nb = GaussianNB()
 	nb_pred = nb.fit(x_train, y_train).predict(x_test)
 	print "\n#### NB\n"
-	print accuracy_score(y_test, nb_pred)
+	print (accuracy_score(y_test, nb_pred))
 	print confusion_matrix(y_test, nb_pred)
+	score =  cross_val_score(nb, X_data, Y_data, cv=cv_k)
+	print sum(score)/len(score)
+
+def adaClassifier(X_data, Y_data, x_train, x_test, y_train, y_test):
+	ada =   AdaBoostClassifier(n_estimators=100, learning_rate=0.25)
+	ada.fit(x_train, y_train)
+	ada_pred = ada.predict(x_test)
+	print "\n#### ADA\n"
+	print (accuracy_score(y_test, ada_pred))
+	print confusion_matrix(y_test, ada_pred)
+	score =  cross_val_score(ada, X_data, Y_data, cv=cv_k)
+	print sum(score)/len(score)
 
 
-
-
+def baggingClassifier(X_data, Y_data, x_train, x_test, y_train, y_test):
+	bag = BaggingClassifier(n_estimators = 20)
+	bag.fit(x_train, y_train)
+	bag_pred = bag.predict(x_test)
+	print "\n#### BAG \n"
+	print (accuracy_score(y_test, bag_pred))
+	print confusion_matrix(y_test, bag_pred)
+	score =  cross_val_score(bag, X_data, Y_data, cv=cv_k)
+	print sum(score)/len(score)
 
 dataset = pd.read_csv('dataset/pulsar_stars.csv')
 #drop missing values
@@ -107,15 +139,21 @@ for i in range(y_test.size):
 n_false = y_test.size - n_true 		
 print 'true, false, total on test, % '
 print n_true, n_false, y_test.size, (n_true*100)/y_test.size
-
+print "\n\n\n"
 #SVM
-SVM(x_train, x_test, y_train, y_test)
-
-#NN
-NN(x_train, x_test, y_train, y_test)
-
-## Random Forest
-randomForest(x_train, x_test, y_train, y_test)
+SVM(X_data, Y_data, x_train, x_test, y_train, y_test)
 
 ##Naive bayes
-naiveBayes(x_train, x_test, y_train, y_test)
+naiveBayes(X_data, Y_data, x_train, x_test, y_train, y_test)
+
+## Random Forest
+randomForest(X_data, Y_data, x_train, x_test, y_train, y_test)
+
+##Ada
+adaClassifier(X_data, Y_data, x_train, x_test, y_train, y_test)
+
+##Bagging
+baggingClassifier(X_data, Y_data, x_train, x_test, y_train, y_test)
+
+#NN
+NN(X_data, Y_data, x_train, x_test, y_train, y_test)
