@@ -8,14 +8,17 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import optimizers
 from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.cluster import KMeans
 from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import BaggingClassifier
+from sklearn.metrics import classification_report,confusion_matrix,accuracy_score,roc_curve,auc
+import matplotlib.pyplot as plt
 
-cv_k = 50
+# k in cross validation k fold
+cv_k = 10
 
 def NN(X_data, Y_data, x_train, x_test, y_train, y_test):
 	num_neurons = 1600
@@ -36,7 +39,7 @@ def NN(X_data, Y_data, x_train, x_test, y_train, y_test):
 	print "\n#### NN\n"
 	print (accuracy_score(y_test, nn_pred))
 	print confusion_matrix(y_test, nn_pred)
-
+	print classification_report(y_test,nn_pred)
 
 
 
@@ -51,6 +54,9 @@ def SVM(X_data, Y_data, x_train, x_test, y_train, y_test):
 
 	score =  cross_val_score(svm_classifier, X_data, Y_data, cv=cv_k)
 	print sum(score)/len(score)
+	print classification_report(y_test,svm_pred)
+	
+	
 
 
 def randomForest(X_data, Y_data, x_train, x_test, y_train, y_test):
@@ -63,6 +69,17 @@ def randomForest(X_data, Y_data, x_train, x_test, y_train, y_test):
 	score =  cross_val_score(rfc, X_data, Y_data, cv=cv_k)
 	print sum(score)/len(score)
 
+	print classification_report(y_test,rfc_pred)
+	predicting_probabilites = rfc.predict_proba(x_test)[:,1]
+	fpr,tpr,thresholds = roc_curve(y_test,predicting_probabilites)
+	plt.subplot(222)
+	plt.figure(figsize=(12,6))
+	plt.plot(fpr,tpr,label = ("Area sob a curva:",auc(fpr,tpr)),color = "r")
+	plt.plot([1,0],[1,0],linestyle = "dashed",color ="k")
+	plt.legend(loc = "best")
+	plt.title("Curva ROC - RFC",fontsize=20)
+	plt.show()
+
 def naiveBayes(X_data, Y_data, x_train, x_test, y_train, y_test):
 	nb = GaussianNB()
 	nb_pred = nb.fit(x_train, y_train).predict(x_test)
@@ -71,6 +88,18 @@ def naiveBayes(X_data, Y_data, x_train, x_test, y_train, y_test):
 	print confusion_matrix(y_test, nb_pred)
 	score =  cross_val_score(nb, X_data, Y_data, cv=cv_k)
 	print sum(score)/len(score)
+
+	print classification_report(y_test,nb_pred)
+	predicting_probabilites = nb.predict_proba(x_test)[:,1]
+	fpr,tpr,thresholds = roc_curve(y_test,predicting_probabilites)
+	plt.subplot(222)
+	plt.figure(figsize=(12,6))
+	plt.plot(fpr,tpr,label = ("Area sob a curva:",auc(fpr,tpr)),color = "r")
+	plt.plot([1,0],[1,0],linestyle = "dashed",color ="k")
+	plt.legend(loc = "best")
+	plt.title("Curva ROC - NB",fontsize=20)
+	plt.show()
+
 
 def adaClassifier(X_data, Y_data, x_train, x_test, y_train, y_test):
 	ada =   AdaBoostClassifier(n_estimators=100, learning_rate=0.25)
@@ -82,6 +111,17 @@ def adaClassifier(X_data, Y_data, x_train, x_test, y_train, y_test):
 	score =  cross_val_score(ada, X_data, Y_data, cv=cv_k)
 	print sum(score)/len(score)
 
+	print classification_report(y_test,ada_pred)
+	predicting_probabilites = ada.predict_proba(x_test)[:,1]
+	fpr,tpr,thresholds = roc_curve(y_test,predicting_probabilites)
+	plt.subplot(222)
+	plt.figure(figsize=(12,6))
+	plt.plot(fpr,tpr,label = ("Area sob a curva:",auc(fpr,tpr)),color = "r")
+	plt.plot([1,0],[1,0],linestyle = "dashed",color ="k")
+	plt.legend(loc = "best")
+	plt.title("Curva ROC - Ada",fontsize=20)
+	plt.show()
+
 
 def baggingClassifier(X_data, Y_data, x_train, x_test, y_train, y_test):
 	bag = BaggingClassifier(n_estimators = 20)
@@ -92,6 +132,39 @@ def baggingClassifier(X_data, Y_data, x_train, x_test, y_train, y_test):
 	print confusion_matrix(y_test, bag_pred)
 	score =  cross_val_score(bag, X_data, Y_data, cv=cv_k)
 	print sum(score)/len(score)
+
+	print classification_report(y_test,bag_pred)
+	predicting_probabilites = bag.predict_proba(x_test)[:,1]
+	fpr,tpr,thresholds = roc_curve(y_test,predicting_probabilites)
+	plt.subplot(222)
+	plt.figure(figsize=(12,6))
+	plt.plot(fpr,tpr,label = ("Area sob a curva:",auc(fpr,tpr)),color = "r")
+	plt.plot([1,0],[1,0],linestyle = "dashed",color ="k")
+	plt.legend(loc = "best")
+	plt.title("Curva ROC - BAG",fontsize=20)
+	plt.show()
+
+def gradientBostingClassifier(X_data, Y_data, x_train, x_test, y_train, y_test):
+	grd = GradientBoostingClassifier(n_estimators=100, learning_rate=0.05)
+	grd.fit(x_train, y_train)
+	grd_pred = grd.predict(x_test)
+	print "\n#### GRB \n"
+	print (accuracy_score(y_test, grd_pred))
+	print confusion_matrix(y_test, grd_pred)
+	score =  cross_val_score(grd, X_data, Y_data, cv=cv_k)
+	print sum(score)/len(score)
+
+	print classification_report(y_test,grd_pred)
+	predicting_probabilites = grd.predict_proba(x_test)[:,1]
+	fpr,tpr,thresholds = roc_curve(y_test,predicting_probabilites)
+	plt.subplot(222)
+	plt.figure(figsize=(12,6))
+	plt.plot(fpr,tpr,label = ("Area sob a curva:",auc(fpr,tpr)),color = "r")
+	plt.plot([1,0],[1,0],linestyle = "dashed",color ="k")
+	plt.legend(loc = "best")
+	plt.title("Curva ROC - GDB",fontsize=20)
+	plt.show()
+
 
 dataset = pd.read_csv('dataset/pulsar_stars.csv')
 #drop missing values
@@ -140,6 +213,7 @@ n_false = y_test.size - n_true
 print 'true, false, total on test, % '
 print n_true, n_false, y_test.size, (n_true*100)/y_test.size
 print "\n\n\n"
+
 #SVM
 SVM(X_data, Y_data, x_train, x_test, y_train, y_test)
 
@@ -154,6 +228,9 @@ adaClassifier(X_data, Y_data, x_train, x_test, y_train, y_test)
 
 ##Bagging
 baggingClassifier(X_data, Y_data, x_train, x_test, y_train, y_test)
+
+##GRD
+gradientBostingClassifier(X_data, Y_data, x_train, x_test, y_train, y_test)
 
 #NN
 NN(X_data, Y_data, x_train, x_test, y_train, y_test)

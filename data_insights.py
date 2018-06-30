@@ -18,18 +18,18 @@ data = data.rename(columns={' Mean of the integrated profile':"mean_profile",
        ' Excess kurtosis of the DM-SNR curve':"kurtosis_dmsnr_curve",
        ' Skewness of the DM-SNR curve':"skewness_dmsnr_curve",
        })
-plt.figure(figsize=(12,6))
+plt.figure(figsize=(9,7))
 plt.subplot(121)
 sns.set(style="darkgrid")
 ax = sns.countplot(x = data["target_class"])
 plt.title("Pulsar/not pulsar")
-#plt.show()
+plt.show()
 
 
 correlation = data.corr()
 plt.figure(figsize=(9,7))
 sns.heatmap(correlation,annot=True,cmap=sns.light_palette("green"),linewidth=2,edgecolor="k")
-plt.title("CORRELATION BETWEEN VARIABLES")
+plt.title("Matriz de correlacao")
 #plt.show()
 
 
@@ -40,13 +40,13 @@ compare = data.groupby("target_class")[['mean_profile', 'std_profile', 'kurtosis
 
 compare = compare.drop("target_class",axis =1)
 sns.set(style="darkgrid")
-compare.plot(kind="barh",width=.6,figsize=(13,6))
-plt.title("media dos valores")
+compare.plot(kind="bar",width=.6,figsize=(13,6))
+plt.title("Media dos valores das caracteristicas")
 
 compare1 = data.groupby("target_class")[['mean_profile', 'std_profile', 'kurtosis_profile', 'skewness_profile',
                                         'mean_dmsnr_curve', 'std_dmsnr_curve', 'kurtosis_dmsnr_curve',
                                         'skewness_dmsnr_curve']].std().reset_index()
 compare1 = compare1.drop("target_class",axis=1)
-compare1.plot(kind="barh",width=.6,figsize=(13,6))
-plt.title("desvio padrao dos valores")
-plt.show()
+compare1.plot(kind="bar",width=.6,figsize=(13,6))
+plt.title("Desvio padrao dos valores das caracteristicas")
+plt.show()"""
